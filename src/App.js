@@ -4,7 +4,7 @@ function App() {
   return (
     <>
     <div className='text-5xl px-16'>
-      Hello
+      Hello my react app
     </div>
       My app
     </>
