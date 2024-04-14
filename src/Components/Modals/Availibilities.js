@@ -1,16 +1,76 @@
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Dropdown from "react-bootstrap/Dropdown";
+import { useParams } from "react-router-dom";
 
 function Availabilities({ name }) {
-  const [availabilities, setAvailabilities] = useState({
-    time: "",
-    schedule_id: "",
-  });
-  const [showModal, setShowModal] = useState(false);
 
-  const handleAddAvailabilities = async () => {
+  const params = useParams();
+  const schId = params.schId;
+  const [availabilities, setAvailabilities] = useState([]);
+  const [time, setTime] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [schedules, setSchedules] = useState([]);
+ 
+  
+
+  useEffect(() => {
+    var config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: "https://psl-test2-b8593d29856b.herokuapp.com/api/v1/schedules/${schId}/availabilities",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("jwttoken"),
+      },
+    };
+    axios
+      .request(config)
+      .then((res) => {
+        console.log(res);
+        setAvailabilities(res.schedule.availabilities);
+        // if (res.data.status == true) {
+        //   setSchedules(res.data.schedules);
+        // } else {
+        //   //Invalid credentials ui
+        // }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+   
+
+
+
+const handleAddAvailabilities = async () => {
+var myHeaders = new Headers();
+myHeaders.append("Authorization", "jwttoken");
+myHeaders.append("Content-Type", "application/json");
+
+var raw = JSON.stringify({
+  availabilities: {
+    time: [time],
+    schedule_id: schId,
+  },
+}
+);
+
+console.log(schedules);
+
+var requestOptions = {
+  method: 'POST',
+  headers: myHeaders,
+  body: raw,
+  redirect: 'follow'
+};
+
+fetch("https://psl-test2-b8593d29856b.herokuapp.com/api/v1/availabilities", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
     var requestOptions = {
       method: 'POST',
       headers: {
@@ -22,13 +82,9 @@ function Availabilities({ name }) {
       redirect: 'follow'
     };
     
-    fetch("https://psl-test2-b8593d29856b.herokuapp.com/api/v1/availabilities", requestOptions)
-      .then(response => response.text())
-      .then(result => console.log(result))
-      .catch(error => console.log('error', error));
-
+  
     setShowModal(false);
-  setAvailabilities({time:'', schedule_id:''});
+  setAvailabilities({time:'', schedule_id: schedules});
   };
   
 
@@ -38,7 +94,7 @@ function Availabilities({ name }) {
   const handleCloseModal = () => {
     setShowModal(false);
   };
-  console.log('availabilities');
+   console.log('availabilities');
   return (
     <>
       <label onClick={handleOpenModal}>{name}</label>
@@ -58,24 +114,38 @@ function Availabilities({ name }) {
                 style={{ backgroundColor: "white" }}
                 onSubmit={handleAddAvailabilities}
               >
+                 <Dropdown>
+                  <Dropdown.Toggle variant="success">Schedule Id</Dropdown.Toggle>
+                  <Dropdown.Menu
+                    onChange={(e) => {
+                      setSchedules(e.target.value);
+
+                    }}
+                    
+                  >
+                    
+                    {schedules.map((s) => (
+                      <Dropdown.Item
+                        onClick={() => {
+                          setSchedules(s.id);
+                        }}
+                      >
+                        {s.id}
+                        {/* {s.date} */}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
                 <label>
                   Time:{" "}
                   <input
                     style={{ border: "1px solid black" }}
                     type="text"
-                    value={availabilities.degree}
+                    value={availabilities.time}
                     onChange={(e) => setAvailabilities({...availabilities,'time':e.target.value})}
                   />
                 </label>
-
-                <label>
-                  schedule_id:{" "}
-                  <input type="text"
-                    style={{ border: "1px solid black" }}
-                    value={availabilities.description}
-                    onChange={(e) => setAvailabilities({...availabilities,'schedule_id':e.target.value})}
-                  />
-                </label>
+ 
               </div>
             </Modal.Body>
 

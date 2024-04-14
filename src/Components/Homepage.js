@@ -96,7 +96,7 @@ export default function Homepage() {
               <Table.HeadCell>FirstName</Table.HeadCell>
               <Table.HeadCell>LastName</Table.HeadCell>
               <Table.HeadCell>Email</Table.HeadCell>
-              <Table.HeadCell>Qualification</Table.HeadCell>
+              {/* <Table.HeadCell>Qualification</Table.HeadCell> */}
               <Table.HeadCell>ContactNumber</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
@@ -108,11 +108,11 @@ export default function Homepage() {
                   <Table.Cell>{doctor.first_name}</Table.Cell>
                   <Table.Cell>{doctor.last_name}</Table.Cell>
                   <Table.Cell>{doctor.email}</Table.Cell>
-                  <Table.Cell>
+                  {/* <Table.Cell>
                     {qualification.map((q) => (
                       <>{`${q.degree}, `}</>
                     ))}
-                  </Table.Cell>
+                  </Table.Cell> */}
 
                   <Table.Cell>{doctor.contact_number}</Table.Cell>
                 </Table.Row>

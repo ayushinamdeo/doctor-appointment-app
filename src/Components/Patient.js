@@ -167,35 +167,7 @@ useEffect(() => {
       </div>
     </div>
   );
-{/* <div className="homepage">
-<h2>Doctor Details</h2>
-<ul>
-       {doctorDetails.map((doctors,index) => (
-<li key={index}>
-           {doctors.id}: {doctors.first_name} - {doctors.last_name}
-</li>
-       ))}
-</ul>
-<p>Name: {doctorDetails.name}</p>
-<p>Schedules: {doctorDetails.specialty}</p>
-<h2>Availability</h2>
-<ul>
-       {doctorSchedules.schedules.map((schedule, index) => (
-<li key={index}>
-           {schedule.day}: {schedule.startTime} - {schedule.endTime}
-</li>
-       ))}
-</ul>
-<h2>Availability</h2>
-<ul>
-       {availability.map((slot, index) => (
-<li key={index}>
-           Date: {slot.date}, Time: {slot.time}
-</li>
-       ))}
-</ul>
-</div>
- */}
+
 
 }; 
 export default Patient;

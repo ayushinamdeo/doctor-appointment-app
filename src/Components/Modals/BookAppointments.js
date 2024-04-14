@@ -6,12 +6,13 @@ import Dropdown from "react-bootstrap/Dropdown";
 import Schedules from "./Schedules";
 
 function BookAppointments({ name }) {
+  // const params = useParams();
+  // const doctorsId = params.doctorsId;
   const [doctors, setDoctors] = useState([]);
+  const [doctorsId, setDoctorsId] = useState([]);
   const [availability, setAvailability] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [schedule, setSchedule] = useState({
-   
-  });
+  const [schedule, setSchedule] = useState([]);
 
   useEffect(() => {
     var config = {
@@ -41,7 +42,7 @@ function BookAppointments({ name }) {
       var config = {
         method: "get",
         maxBodyLength: Infinity,
-        url: "https://psl-test2-b8593d29856b.herokuapp.com/api/v1/doctors/55c9c836-9803-4e6a-b0c6-6b7a64669c73/schedules",
+        url: "https://psl-test2-b8593d29856b.herokuapp.com/api/v1/doctors/${doctorsId}/schedules",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("jwttoken"),
@@ -172,13 +173,28 @@ function BookAppointments({ name }) {
               
               <Dropdown>
                 <Dropdown.Toggle variant="success">Doctors</Dropdown.Toggle>
-                <Dropdown.Menu>
+                <Dropdown.Menu
+                    onChange={(e) => {
+                      setDoctorsId(e.target.value);
+                    }}
+                  >
+                    {doctors.map((doctor) => (
+                      <Dropdown.Item
+                        onClick={() => {
+                          setDoctorsId(doctor.id);
+                        }}
+                      >
+                        {doctor.first_name}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                {/* <Dropdown.Menu>
                   {doctors.map((doctor) => (
                     <Dropdown.Item href="#">
                       {doctor.id}
                     </Dropdown.Item>
                   ))}
-                </Dropdown.Menu>
+                </Dropdown.Menu> */}
               </Dropdown>
               <Dropdown>
                 <Dropdown.Toggle variant="success">Schedule</Dropdown.Toggle>

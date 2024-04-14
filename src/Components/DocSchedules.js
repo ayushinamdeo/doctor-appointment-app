@@ -2,30 +2,37 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { Sidebar } from "flowbite-react";
+import { Link, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
-const Appointments = () => {
-  const [data, setData] = useState([]);
+const DocSchedules = () => {
+  const params = useParams();
+  const drId = params.drId;
+  const token = localStorage.getItem("jwttoken");
+  const [scheduleId, setScheduleId] = useState("");
+  const [schedules, setSchedules] = useState([]);
 
   useEffect(() => {
     fetchData();
-    handleEditButton();
+    // handleEditButton();
   }, []);
   const fetchData = async () => {
     try {
       const response = await fetch(
-        "https://psl-test2-b8593d29856b.herokuapp.com/api/v1/doctors/55c9c836-9803-4e6a-b0c6-6b7a64669c73/schedules"
+        `https://psl-test2-b8593d29856b.herokuapp.com/api/v1/doctors/${drId}/schedules`
       );
       const data = await response.json();
       console.log(data);
-      setData(data.schedules);
+      setSchedules(data.schedules);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-  const handleEditButton = () => {
+
+  const handleEditButton = (holiday) => {
     var raw = JSON.stringify({
       schedule: {
-        is_holiday: true,
+        is_holiday: !holiday,
       },
     });
 
@@ -40,11 +47,13 @@ const Appointments = () => {
     };
 
     fetch(
-      "https://psl-test2-b8593d29856b.herokuapp.com/api/v1/doctors/55c9c836-9803-4e6a-b0c6-6b7a64669c73/schedules/088283d3-facb-4c6e-b0db-17b0a39e27ae",
+      `https://psl-test2-b8593d29856b.herokuapp.com/api/v1/doctors/${drId}/schedules/${scheduleId}`,
       requestOptions
     )
       .then((response) => response.text())
-      .then((result) => console.log(result))
+      .then((result) => {
+        console.log(result);
+      })
       .catch((error) => console.log("error", error));
   };
 
@@ -75,16 +84,21 @@ const Appointments = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map((item, index) => (
+              {schedules.map((item, index) => (
                 <tr key={index}>
                   <td>{item.date}</td>
                   <td>{item.is_holiday ? "YES" : "NO"}</td>
                   <td>
                     {
                       <button
-                        onClick={handleEditButton}
+                        button
                         type="button"
                         class="btn btn-info"
+                        onClick={() => {
+                          setScheduleId(item.id);
+                          item.is_holiday = !item.is_holiday;
+                          handleEditButton(item.is_holiday);
+                        }}
                       >
                         Edit
                       </button>
@@ -99,4 +113,5 @@ const Appointments = () => {
     </div>
   );
 };
-export default Appointments;
+
+export default DocSchedules;

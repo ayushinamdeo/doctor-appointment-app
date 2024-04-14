@@ -6,41 +6,11 @@ import Dropdown from "react-bootstrap/Dropdown";
 
 function Schedules({ name }) {
   const [doctors, setDoctors] = useState([]);
+  const [doctorsId, setDoctorsId] = useState([]);
+  const [day, setDay] = useState([]);
+  const [timings, setTimings] = useState([""]);
   const [showModal, setShowModal] = useState(false);
-  const [schedule, setschedule] = useState({
-    doctor: "52553b23-c843-408d-a1f6-c730d638409b",
-    days: [
-      {
-        day: "SunDay",
-        time: ["10:10 am", "11:00 am", "12:00 pm", "09:28 pm"],
-      },
-      {
-        day: "monday",
-        time: ["09:28 pm", "08:00 am", "11:00 am"],
-      },
-      {
-        day: "tuesday",
-        time: ["09:28 pm", "08:00 am", "11:00 am"],
-      },
-      {
-        day: "wednesday",
-        time: ["09:28 pm", "08:00 am", "11:00 am"],
-      },
-      {
-        day: "thursday",
-        time: ["09:28 pm", "08:00 am", "11:00 am"],
-      },
-      {
-        day: "friday",
-        time: ["09:28 pm", "08:00 am", "11:00 am"],
-      },
-      {
-        day: "saturday",
-        time: ["09:28 pm", "08:00 am", "11:00 am"],
-      },
-    ],
-  });
-
+ 
   useEffect(() => {
     var config = {
       method: "get",
@@ -66,18 +36,30 @@ function Schedules({ name }) {
       });
   }, []);
 
-  //   const [showModal, setShowModal] = useState(false);
-
   const handleAddschedule = async () => {
-    var requestOptions = {
-      method: "POST",
+    console.log(timings);
+    console.log(day);
+    const token = localStorage.getItem("jwttoken");
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${token}`);
 
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("jwttoken"),
-        body: JSON.stringify({ schedule: schedule }),
+    const raw = JSON.stringify({
+      schedule: {
+        doctor: doctorsId,
+        days: [
+          {
+            day: day,
+            time: [...timings],
+          },
+        ],
       },
-      body: JSON.stringify({ schedule }),
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
       redirect: "follow",
     };
 
@@ -86,11 +68,19 @@ function Schedules({ name }) {
       requestOptions
     )
       .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.log("error", error));
+      .then((result) => {
+        const res = JSON.parse(result);
+        if (res.status) {
+          console.log(res.message);
+        } else {
+          console.log(res.message + "\n You are not Allowed to do this");
+        }
+      })
+      .catch((error) => console.error(error));
+
+    console.log(raw);
 
     setShowModal(false);
-    setschedule({ degree: "", description: "" });
   };
 
   const handleOpenModal = () => {
@@ -99,7 +89,7 @@ function Schedules({ name }) {
   const handleCloseModal = () => {
     setShowModal(false);
   };
-  console.log("schedule");
+
   return (
     <>
       <label onClick={handleOpenModal}>{name}</label>
@@ -118,68 +108,118 @@ function Schedules({ name }) {
                 style={{ backgroundColor: "white" }}
                 onSubmit={handleAddschedule}
               >
-                {/* <label>
-                  Degree:{" "}
-                  <input
-                    style={{ border: "1px solid black" }}
-                    type="text"
-                    value={schedule.doctor}
-                    onChange={(e) =>
-                      setschedule({ ...schedule, doctor: e.target.value })
-                    }
-                  />
-                </label> */}
-
-                {/* <label>
-                  Description:{" "}
-                  <textarea
-                    style={{ border: "1px solid black" }}
-                    value={schedule.description}
-                    onChange={(e) =>
-                      setschedule({ ...schedule, description: e.target.value })
-                    }
-                  />
-                </label> */}
-              
-              <Dropdown>
-                <Dropdown.Toggle variant="success">Doctors</Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {doctors.map((doctor) => (
-                    <Dropdown.Item href="#">
-                      {doctor.first_name + " " + doctor.last_name}
+                <Dropdown>
+                  <Dropdown.Toggle variant="success">Doctors</Dropdown.Toggle>
+                  <Dropdown.Menu
+                    onChange={(e) => {
+                      setDoctorsId(e.target.value);
+                    }}
+                  >
+                    {doctors.map((doctor) => (
+                      <Dropdown.Item
+                        onClick={() => {
+                          setDoctorsId(doctor.id);
+                        }}
+                      >
+                        {doctor.first_name}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+                <Dropdown>
+                  <Dropdown.Toggle variant="success">Day</Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item
+                      onClick={() => {
+                        setDay("sunday");
+                      }}
+                    >
+                      {"sunday"}
                     </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown>
-              <Dropdown>
-                <Dropdown.Toggle variant="success">Day</Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {schedule.days.map((day) => (
-                    <Dropdown.Item href="#">
-                      {day.day + " " + day.time}
+                    <Dropdown.Item
+                      onClick={() => {
+                        setDay("monday");
+                      }}
+                    >
+                      {"monday"}
                     </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown>
-              {/* <Dropdown>
-                <Dropdown.Toggle variant="success">Time</Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {doctors.map((doctor) => (
-                    <Dropdown.Item href="#">
-                      {doctor.first_name + " " + doctor.last_name}
+                    <Dropdown.Item
+                      onClick={() => {
+                        setDay("tuesday");
+                      }}
+                    >
+                      {"tuesday"}
                     </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown> */}
+                    <Dropdown.Item
+                      onClick={() => {
+                        setDay("wednesday");
+                      }}
+                    >
+                      {"wednesday"}
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      onClick={() => {
+                        setDay("thursday");
+                      }}
+                    >
+                      {"thursday"}
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      onClick={() => {
+                        setDay("friday");
+                      }}
+                    >
+                      {"friday"}
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      onClick={() => {
+                        setDay("saturday");
+                      }}
+                    >
+                      {"saturday"}
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </div>
-              <label>
-                  time:{" "}
-                  <input type="text"
-                    style={{ border: "1px solid black" }}
-                    value={schedule.doctor.time}
-                    onChange={(e) => setschedule({...schedule,'time':e.target.value})}
+              <label>Timings</label>
+              {timings.map((timing, i) => (
+                <div key={i}>
+                  <input
+                    className="border"
+                    type="text"
+                    key={i}
+                    id="id"
+                    value={timing}
+                    onChange={(event) => {
+                      const timeArray = [...timings];
+                      timeArray[i] = event.target.value;
+                      setTimings(timeArray);
+                    }}
                   />
-                </label>
+                  <button
+                    className="w-[15%] ml-[5%] border rounded-lg bg-red-400 text-white hover:bg-red-500"
+                    onClick={() => {
+                      if (timings.length > 1) {
+                        const newTimings = timings.filter(
+                          (_, index) => index !== i
+                        );
+                        setTimings(newTimings);
+                      }
+                    }}
+                  >
+                    {" "}
+                    X
+                  </button>
+                </div>
+              ))}
+              <button
+                className="w-full border rounded-lg bg-gray-100 text-gray-800 p-2.5 hover:bg-blue-300"
+                onClick={() => {
+                  setTimings([...timings, ""]);
+                }}
+              >
+                +
+              </button>
             </Modal.Body>
 
             <Modal.Footer>
